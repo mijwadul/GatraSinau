@@ -1,23 +1,19 @@
+// frontend/src/App.js
 import React from 'react';
-import PdfUpload from './components/PdfUpload';
-import UploadStatus from './components/UploadStatus';
-import AiGenerator from './components/AiGenerator'; // Import the new component
-import { Container, Box, Typography, Divider } from '@mui/material';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import LoginPage from './pages/LoginPage';
+import DashboardPage from './pages/DashboardPage';
 
 function App() {
   return (
-    <Container maxWidth="md">
-      <Box sx={{ my: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom align="center">
-          Gatra Sinau.AI 
-        </Typography>
-        <PdfUpload />
-        <Divider sx={{ my: 4 }} />
-        <UploadStatus />
-        <Divider sx={{ my: 4 }} />
-        <AiGenerator /> {/* Add the AI generator component */}
-      </Box>
-    </Container>
+    <Router>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
+        {/* Redirect default route to login page */}
+        <Route path="*" element={<Navigate to="/login" />} />
+      </Routes>
+    </Router>
   );
 }
 
