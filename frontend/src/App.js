@@ -3,7 +3,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
-import UserManagementPage from './pages/user/UserManagementPage'; 
+import UserManagementPage from './pages/user/UserManagementPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import { AnimatePresence } from 'framer-motion';

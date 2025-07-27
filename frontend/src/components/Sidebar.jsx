@@ -1,6 +1,9 @@
 import React, { useContext } from 'react';
 import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
+import DescriptionIcon from '@mui/icons-material/Description';
+import SmartToyIcon from '@mui/icons-material/SmartToy';
+import AssessmentIcon from '@mui/icons-material/Assessment';
 import PeopleIcon from '@mui/icons-material/People';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate } from 'react-router-dom';
@@ -13,18 +16,20 @@ const SidebarContent = () => {
 
   const menuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard', roles: ['Developer', 'School Admin', 'Teacher'] },
+    { text: 'Docs', icon: <DescriptionIcon />, path: '#', roles: ['Developer', 'School Admin', 'Teacher'] },
+    { text: 'AI Tools', icon: <SmartToyIcon />, path: '#', roles: ['Developer', 'School Admin', 'Teacher'] },
+    { text: 'Reports', icon: <AssessmentIcon />, path: '#', roles: ['Developer', 'School Admin', 'Teacher'] },
     { text: 'User Management', icon: <PeopleIcon />, path: '/users', roles: ['Developer', 'School Admin'] },
   ];
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <List>
-        <ListItem sx={{ height: '100px', display: 'flex', justifyContent: 'center', p: 1 }}>
+        <ListItem sx={{ height: '64px', display: 'flex', justifyContent: 'center', p: 1 }}>
           <img src={LogoImage} alt="Gatra Sinau.AI Logo" style={{ maxHeight: '100%', maxWidth: '100%' }} />
         </ListItem>
         <Divider />
         {menuItems.map((item) => (
-          // Conditionally render the item based on the user's role
           user && item.roles.includes(user.role) && (
             <ListItem key={item.text} disablePadding>
               <ListItemButton onClick={() => navigate(item.path)}>
