@@ -1,7 +1,7 @@
 import click
 from flask.cli import with_appcontext
 from .extensions import db
-from .models import User
+from .models import User, School
 from flask_bcrypt import Bcrypt
 
 bcrypt = Bcrypt()
@@ -31,7 +31,21 @@ def create_developer_command(email, username, password):
 
     click.echo(f'Developer account for "{username}" created successfully.')
 
+@click.command('create-school')
+@with_appcontext
+@click.argument('name')
+def create_school_command(name):
+    """Creates a new school."""
+    if School.query.filter_by(name=name).first():
+        click.echo('Error: A school with that name already exists.')
+        return
+    
+    new_school = School(name=name)
+    db.session.add(new_school)
+    db.session.commit()
+    click.echo(f'School "{name}" created successfully.')
+
 def init_app(app):
-    # We need to initialize bcrypt here as well
     bcrypt.init_app(app)
     app.cli.add_command(create_developer_command)
+    app.cli.add_command(create_school_command) # Register the new command

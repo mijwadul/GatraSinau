@@ -1,6 +1,7 @@
 from flask import request, jsonify, Blueprint, current_app
 from ..models import User
 from ..extensions import db, bcrypt
+from ..utils.decorators import token_required
 import jwt
 import datetime
 
@@ -29,3 +30,14 @@ def login():
         return jsonify({"token": token}), 200
     else:
         return jsonify({"error": "Invalid credentials."}), 401
+
+@auth_bp.route('/api/auth/profile', methods=['GET'])
+@token_required
+def get_profile(current_user):
+    """Gets the profile of the currently logged-in user."""
+    return jsonify({
+        "id": current_user.id,
+        "username": current_user.username,
+        "email": current_user.email,
+        "role": current_user.role
+    }), 200    
