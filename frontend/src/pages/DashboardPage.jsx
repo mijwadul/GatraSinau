@@ -4,9 +4,7 @@ import { motion } from 'framer-motion';
 import AuthContext from '../context/AuthContext';
 import SummaryCard from '../components/dashboard/SummaryCard';
 import ActivityItem from '../components/dashboard/ActivityItem';
-import DashboardImage from '../assets/dashboard.png'; // Import your dashboard image
-
-// Icons for placeholders
+import DashboardImage from '../assets/dashboard.png';
 import DescriptionIcon from '@mui/icons-material/Description';
 import SchoolIcon from '@mui/icons-material/School';
 import GroupIcon from '@mui/icons-material/Group';
@@ -41,49 +39,24 @@ function DashboardPage() {
 
   return (
     <motion.div initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition} style={{ position: 'relative' }}>
-      <Box
-        sx={{
-          // --- RESPONSIVE BACKGROUND ---
-          position: 'relative',
-          p: { xs: 2, sm: 3 },
-          // Apply background only on mobile
-          '&::before': {
-            content: { xs: '""', md: 'none' }, // Only apply on xs screens
-            position: 'absolute',
-            top: 0, left: 0, right: 0, bottom: 0,
-            backgroundImage: `url(${DashboardImage})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            opacity: 0.1,
-            zIndex: -1,
-          },
-        }}
-      >
+      <Box sx={{ position: 'relative', p: { xs: 2, sm: 3 }, '&::before': { content: { xs: '""', md: 'none' }, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundImage: `url(${DashboardImage})`, backgroundSize: 'cover', backgroundPosition: 'center', opacity: 0.1, zIndex: -1, }, }}>
         <Grid container spacing={4} alignItems="center">
-          {/* --- LEFT CONTENT COLUMN --- */}
-          <Grid item xs={12} md={7} lg={8}>
-            {/* Welcome Section */}
+          <Grid xs={12} md={7} lg={8}>
             <Box sx={{ mb: 4 }}>
               <Typography variant="h4">Selamat Datang, {user?.username || 'Pengguna'}!</Typography>
               <Typography variant="body1" color="text.secondary">Ini adalah beranda untuk mengelola aktivitas Anda.</Typography>
             </Box>
-
-            {/* Action Buttons */}
             <Box sx={{ mb: 4, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
               <Button variant="contained">Dokumen AI</Button>
               <Button variant="outlined">Manajemen Kelas</Button>
               <Button variant="outlined">Data Siswa</Button>
             </Box>
-
-            {/* Main Content Grid */}
             <Grid container spacing={3}>
-              {/* Summary Column */}
-              <Grid item xs={12} lg={6}>
+              <Grid xs={12} lg={6}>
                 <Typography variant="h6" gutterBottom>Ringkasan</Typography>
                 {summaryData.map(item => <SummaryCard key={item.label} {...item} />)}
               </Grid>
-              {/* Recent Activity Column */}
-              <Grid item xs={12} lg={6}>
+              <Grid xs={12} lg={6}>
                 <Typography variant="h6" gutterBottom>Aktivitas Terbaru</Typography>
                 <Paper sx={{ p: 2 }}>
                   {activityData.map(item => <ActivityItem key={item.text} {...item} />)}
@@ -91,24 +64,12 @@ function DashboardPage() {
               </Grid>
             </Grid>
           </Grid>
-
-          {/* --- RIGHT IMAGE COLUMN (Desktop Only) --- */}
-          <Grid item md={5} lg={4} sx={{ display: { xs: 'none', md: 'flex' } }}>
-            <Box
-              component="img"
-              src={DashboardImage}
-              alt="Dashboard Illustration"
-              sx={{
-                width: '100%',
-                maxWidth: 400,
-                mx: 'auto'
-              }}
-            />
+          <Grid md={5} lg={4} sx={{ display: { xs: 'none', md: 'flex' } }}>
+            <Box component="img" src={DashboardImage} alt="Dashboard Illustration" sx={{ width: '100%', maxWidth: 400, mx: 'auto' }}/>
           </Grid>
         </Grid>
       </Box>
     </motion.div>
   );
 }
-
 export default DashboardPage;

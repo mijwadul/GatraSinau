@@ -27,12 +27,14 @@ def create_app():
     from . import models
 
     # --- Register Blueprints ---
-    from .routes import upload_routes, status_routes, generate_routes, auth_routes, user_management_routes
+    from .routes import upload_routes, status_routes, generate_routes, auth_routes, user_management_routes, class_routes, school_routes
     app.register_blueprint(upload_routes.upload_bp)
     app.register_blueprint(status_routes.status_bp)
     app.register_blueprint(generate_routes.generate_bp)
     app.register_blueprint(auth_routes.auth_bp)
     app.register_blueprint(user_management_routes.user_mgmt_bp)
+    app.register_blueprint(class_routes.class_bp)
+    app.register_blueprint(school_routes.school_bp)
     
     from . import commands
     commands.init_app(app)

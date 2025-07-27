@@ -6,6 +6,8 @@ import DashboardPage from './pages/DashboardPage';
 import UserManagementPage from './pages/user/UserManagementPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
+import SchoolManagementPage from './pages/SchoolManagementPage'; // Import new page
+import ClassManagementPage from './pages/ClassManagementPage'; // Import new page
 import { AnimatePresence } from 'framer-motion';
 
 function AppRoutes() {
@@ -24,6 +26,8 @@ function AppRoutes() {
           }
         >
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/schools" element={<SchoolManagementPage />} />
+          <Route path="/classes" element={<ClassManagementPage />} />
           <Route path="/users" element={<UserManagementPage />} />
         </Route>
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
-import { Box, Typography, Paper, Table, TableCell, TableContainer, TableHead, TableRow, Button, CircularProgress, IconButton } from '@mui/material';
+import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, CircularProgress, IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { motion } from 'framer-motion';
@@ -15,16 +15,6 @@ const pageVariants = {
   out: { opacity: 0, rotateY: 90 },
 };
 const pageTransition = { type: 'tween', ease: 'anticipate', duration: 0.5 };
-
-// Animation variants for the table
-const tableContainerVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
-};
-const tableRowVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
-};
 
 const INITIAL_FORM_STATE = {
   username: '',
@@ -150,18 +140,24 @@ function UserManagementPage() {
     <motion.div initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition} style={{ position: 'absolute', width: '100%' }}>
       <Box sx={{ p: { xs: 2, sm: 3 } }}>
         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: 'center', textAlign: { xs: 'center', md: 'left' }, justifyContent: 'space-between', mb: 4 }}>
-          <Box sx={{ mb: { xs: 2, md: 0 } }}>
+          <Box sx={{ mb: { xs: 3, md: 0 } }}>
             <Typography variant="h4">User Management</Typography>
             <Typography variant="body2" color="text.secondary">
               Create, view, and manage user accounts for your institution.
             </Typography>
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button variant="contained" onClick={handleOpenCreateModal} sx={{ mt: 2 }}>
-                Add New User
-              </Button>
-            </motion.div>
+            <Button variant="contained" onClick={handleOpenCreateModal} sx={{ mt: 2 }}>
+              Add New User
+            </Button>
           </Box>
-          <Box component="img" src={UserImage} alt="User management illustration" sx={{ height: { xs: 100, md: 120 } }} />
+          <Box
+            component="img"
+            src={UserImage}
+            alt="User management illustration"
+            sx={{
+              height: { xs: 120, md: 160 },
+              maxWidth: { xs: '80%', md: 'auto' }
+            }}
+          />
         </Box>
         
         <TableContainer component={Paper}>
@@ -174,13 +170,9 @@ function UserManagementPage() {
                   <TableCell align="right">Actions</TableCell>
                 </TableRow>
               </TableHead>
-              <motion.tbody variants={tableContainerVariants} initial="hidden" animate="visible">
+              <TableBody>
                 {users.map((row) => (
-                  <motion.tr 
-                    key={row.id} 
-                    variants={tableRowVariants}
-                    component={TableRow} // Use TableRow component for proper table structure
-                  >
+                  <TableRow key={row.id}>
                     <TableCell>{row.username}</TableCell>
                     <TableCell>{row.email}</TableCell>
                     <TableCell>{row.role}</TableCell>
@@ -192,9 +184,9 @@ function UserManagementPage() {
                         <DeleteIcon />
                       </IconButton>
                     </TableCell>
-                  </motion.tr>
+                  </TableRow>
                 ))}
-              </motion.tbody>
+              </TableBody>
             </Table>
           </TableContainer>
       </Box>
