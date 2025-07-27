@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
-import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, CircularProgress } from '@mui/material';
+import { Box, Typography, Paper, Table, TableCell, TableContainer, TableHead, TableRow, Button, CircularProgress, IconButton } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { motion } from 'framer-motion';
 import AuthContext from '../../context/AuthContext';
 import UserFormModal from '../../components/user/UserFormModal';
+import ConfirmationModal from '../../components/common/ConfirmationModal';
 import UserImage from '../../assets/user.png';
 
 const pageVariants = {
@@ -12,6 +15,16 @@ const pageVariants = {
   out: { opacity: 0, rotateY: 90 },
 };
 const pageTransition = { type: 'tween', ease: 'anticipate', duration: 0.5 };
+
+// Animation variants for the table
+const tableContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
+};
+const tableRowVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
 
 const INITIAL_FORM_STATE = {
   username: '',
@@ -27,8 +40,12 @@ function UserManagementPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [formData, setFormData] = useState(INITIAL_FORM_STATE);
+  const [editingUser, setEditingUser] = useState(null);
+
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
 
   const fetchUsers = async () => {
     try {
@@ -54,28 +71,68 @@ function UserManagementPage() {
     }
   }, [user]);
 
-  const handleOpenModal = () => {
+  const handleOpenCreateModal = () => {
+    setEditingUser(null);
     setFormData(INITIAL_FORM_STATE);
-    setIsModalOpen(true);
+    setIsFormModalOpen(true);
   };
-  const handleCloseModal = () => setIsModalOpen(false);
+  
+  const handleOpenEditModal = (userToEdit) => {
+    setEditingUser(userToEdit);
+    setIsFormModalOpen(true);
+  };
+  
+  const handleCloseFormModal = () => {
+    setIsFormModalOpen(false);
+    setEditingUser(null);
+  };
 
-  const handleAddUser = async (submittedData) => {
+  const handleFormSubmit = async (submittedData) => {
+    const token = localStorage.getItem('authToken');
+    const url = editingUser 
+      ? `http://localhost:5000/api/users/${editingUser.id}`
+      : 'http://localhost:5000/api/users';
+    const method = editingUser ? 'put' : 'post';
+
+    if (editingUser && !submittedData.password) {
+      delete submittedData.password;
+    }
+
     try {
-      const token = localStorage.getItem('authToken');
-      await axios.post('http://localhost:5000/api/users', submittedData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      handleCloseModal();
+      await axios[method](url, submittedData, { headers: { Authorization: `Bearer ${token}` } });
+      handleCloseFormModal();
       fetchUsers();
     } catch (err) {
-      alert(err.response?.data?.error || 'Failed to create user.');
+      alert(err.response?.data?.error || 'Failed to save user.');
+    }
+  };
+
+  const handleOpenConfirmModal = (user) => {
+    setUserToDelete(user);
+    setIsConfirmModalOpen(true);
+  };
+
+  const handleCloseConfirmModal = () => {
+    setUserToDelete(null);
+    setIsConfirmModalOpen(false);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!userToDelete) return;
+    try {
+        const token = localStorage.getItem('authToken');
+        await axios.delete(`http://localhost:5000/api/users/${userToDelete.id}`, { headers: { Authorization: `Bearer ${token}` } });
+        fetchUsers();
+    } catch(err) {
+        alert(err.response?.data?.error || 'Failed to delete user.');
+    } finally {
+        handleCloseConfirmModal();
     }
   };
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
         <CircularProgress />
       </Box>
     );
@@ -91,33 +148,20 @@ function UserManagementPage() {
 
   return (
     <motion.div initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition} style={{ position: 'absolute', width: '100%' }}>
-      <Box sx={{ p: { xs: 2, sm: 3 } }}> {/* Adjusted padding for mobile */}
-        <Box sx={{
-          display: 'flex',
-          // --- MODIFIED SECTION START ---
-          flexDirection: { xs: 'column', md: 'row' }, // Stack on mobile, row on desktop
-          alignItems: 'center', // Center items when stacked
-          textAlign: { xs: 'center', md: 'left' }, // Center text on mobile
-          // --- MODIFIED SECTION END ---
-          justifyContent: 'space-between',
-          mb: 4
-        }}>
+      <Box sx={{ p: { xs: 2, sm: 3 } }}>
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: 'center', textAlign: { xs: 'center', md: 'left' }, justifyContent: 'space-between', mb: 4 }}>
           <Box sx={{ mb: { xs: 2, md: 0 } }}>
             <Typography variant="h4">User Management</Typography>
             <Typography variant="body2" color="text.secondary">
               Create, view, and manage user accounts for your institution.
             </Typography>
-            <Button variant="contained" onClick={handleOpenModal} sx={{ mt: 2 }}>
-              Add New User
-            </Button>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button variant="contained" onClick={handleOpenCreateModal} sx={{ mt: 2 }}>
+                Add New User
+              </Button>
+            </motion.div>
           </Box>
-          <Box
-            component="img"
-            src={UserImage}
-            alt="User management illustration"
-            // The image is now always visible, with a smaller height on mobile
-            sx={{ height: { xs: 100, md: 120 } }} 
-          />
+          <Box component="img" src={UserImage} alt="User management illustration" sx={{ height: { xs: 100, md: 120 } }} />
         </Box>
         
         <TableContainer component={Paper}>
@@ -130,25 +174,44 @@ function UserManagementPage() {
                   <TableCell align="right">Actions</TableCell>
                 </TableRow>
               </TableHead>
-              <TableBody>
+              <motion.tbody variants={tableContainerVariants} initial="hidden" animate="visible">
                 {users.map((row) => (
-                  <TableRow key={row.id}>
+                  <motion.tr 
+                    key={row.id} 
+                    variants={tableRowVariants}
+                    component={TableRow} // Use TableRow component for proper table structure
+                  >
                     <TableCell>{row.username}</TableCell>
                     <TableCell>{row.email}</TableCell>
                     <TableCell>{row.role}</TableCell>
-                    <TableCell align="right">{/* Action buttons will go here */}</TableCell>
-                  </TableRow>
+                    <TableCell align="right">
+                      <IconButton onClick={() => handleOpenEditModal(row)} color="primary" disabled={user && user.id === row.id}>
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton onClick={() => handleOpenConfirmModal(row)} color="error" disabled={user && user.id === row.id}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </TableCell>
+                  </motion.tr>
                 ))}
-              </TableBody>
+              </motion.tbody>
             </Table>
           </TableContainer>
       </Box>
       <UserFormModal 
-        open={isModalOpen}
-        onClose={handleCloseModal}
-        onSubmit={handleAddUser}
+        open={isFormModalOpen}
+        onClose={handleCloseFormModal}
+        onSubmit={handleFormSubmit}
         formData={formData}
         setFormData={setFormData}
+        initialData={editingUser || {}}
+      />
+      <ConfirmationModal
+        open={isConfirmModalOpen}
+        onClose={handleCloseConfirmModal}
+        onConfirm={handleConfirmDelete}
+        title="Confirm Deletion"
+        message={`Are you sure you want to delete the user "${userToDelete?.username}"? This action cannot be undone.`}
       />
     </motion.div>
   );

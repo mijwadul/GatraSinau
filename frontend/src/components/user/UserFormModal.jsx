@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, FormControl, InputLabel, Select, MenuItem, FormHelperText } from '@mui/material';
 
-function UserFormModal({ open, onClose, onSubmit, formData, setFormData }) {
+function UserFormModal({ open, onClose, onSubmit, formData, setFormData, initialData = {} }) {
   const [error, setError] = useState('');
 
   const handleChange = (e) => {
@@ -11,7 +11,7 @@ function UserFormModal({ open, onClose, onSubmit, formData, setFormData }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setError(''); // Clear previous errors
+    setError('');
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match.');
       return;
@@ -22,12 +22,33 @@ function UserFormModal({ open, onClose, onSubmit, formData, setFormData }) {
 
   return (
     <Dialog open={open} onClose={onClose} component="form" onSubmit={handleSubmit} fullWidth maxWidth="xs">
-      <DialogTitle>Add New User</DialogTitle>
+      <DialogTitle>{initialData.id ? 'Edit User' : 'Add New User'}</DialogTitle>
       <DialogContent>
+        {/* TextFields and Select components remain the same */}
         <TextField autoFocus margin="dense" name="username" label="Username" fullWidth value={formData.username} onChange={handleChange} required />
         <TextField margin="dense" name="email" label="Email Address" type="email" fullWidth value={formData.email} onChange={handleChange} required />
-        <TextField margin="dense" name="password" label="Password" type="password" fullWidth value={formData.password} onChange={handleChange} required />
-        <TextField margin="dense" name="confirmPassword" label="Confirm Password" type="password" fullWidth value={formData.confirmPassword} onChange={handleChange} required error={!!error} />
+        <TextField
+          margin="dense"
+          name="password"
+          label="Password"
+          type="password"
+          fullWidth
+          value={formData.password}
+          onChange={handleChange}
+          required={!initialData.id}
+          helperText={initialData.id ? "Leave blank to keep current password" : ""}
+        />
+        <TextField
+          margin="dense"
+          name="confirmPassword"
+          label="Confirm Password"
+          type="password"
+          fullWidth
+          value={formData.confirmPassword}
+          onChange={handleChange}
+          required={!initialData.id || !!formData.password}
+          error={!!error}
+        />
         <FormControl fullWidth margin="dense" required>
           <InputLabel>Role</InputLabel>
           <Select name="role" value={formData.role} label="Role" onChange={handleChange}>
@@ -40,7 +61,9 @@ function UserFormModal({ open, onClose, onSubmit, formData, setFormData }) {
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button type="submit" variant="contained">Create User</Button>
+        <Button type="submit" variant="contained">
+          {initialData.id ? 'Confirm' : 'Create User'}
+        </Button>
       </DialogActions>
     </Dialog>
   );
