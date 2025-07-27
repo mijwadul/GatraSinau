@@ -2,18 +2,18 @@ import React, { useContext } from 'react';
 import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import PeopleIcon from '@mui/icons-material/People';
-import LogoutIcon from '@mui/icons-material/Logout'; // Import logout icon
+import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate } from 'react-router-dom';
 import LogoImage from '../assets/logo.png';
-import AuthContext from '../context/AuthContext'; // Import AuthContext
+import AuthContext from '../context/AuthContext';
 
 const SidebarContent = () => {
   const navigate = useNavigate();
-  const { logout } = useContext(AuthContext); // Get the logout function from context
+  const { user, logout } = useContext(AuthContext);
 
   const menuItems = [
-    { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-    { text: 'User Management', icon: <PeopleIcon />, path: '/users' },
+    { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard', roles: ['Developer', 'School Admin', 'Teacher'] },
+    { text: 'User Management', icon: <PeopleIcon />, path: '/users', roles: ['Developer', 'School Admin'] },
   ];
 
   return (
@@ -24,15 +24,18 @@ const SidebarContent = () => {
         </ListItem>
         <Divider />
         {menuItems.map((item) => (
-          <ListItem key={item.text} disablePadding>
-            <ListItemButton onClick={() => navigate(item.path)}>
-              <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.text} />
-            </ListItemButton>
-          </ListItem>
+          // Conditionally render the item based on the user's role
+          user && item.roles.includes(user.role) && (
+            <ListItem key={item.text} disablePadding>
+              <ListItemButton onClick={() => navigate(item.path)}>
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.text} />
+              </ListItemButton>
+            </ListItem>
+          )
         ))}
       </List>
-      <Box sx={{ marginTop: 'auto' }}> {/* Pushes logout to the bottom */}
+      <Box sx={{ marginTop: 'auto' }}>
         <List>
           <Divider />
           <ListItem disablePadding>
