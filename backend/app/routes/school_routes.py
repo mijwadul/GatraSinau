@@ -10,7 +10,7 @@ school_bp = Blueprint('school_bp', __name__)
 def get_schools(current_user):
     """Get a list of all schools."""
     schools = School.query.all()
-    school_list = [{"id": s.id, "name": s.name} for s in schools]
+    school_list = [{"id": s.id, "name": s.name, "address": s.address} for s in schools]
     return jsonify(school_list)
 
 @school_bp.route('/api/schools', methods=['POST'])
@@ -27,7 +27,7 @@ def create_school(current_user):
     if School.query.filter_by(name=data['name']).first():
         return jsonify({"error": "A school with this name already exists."}), 409
 
-    new_school = School(name=data['name'])
+    new_school = School(name=data['name'], address=data.get('address'))
     db.session.add(new_school)
     db.session.commit()
     return jsonify({"message": "School created successfully.", "id": new_school.id}), 201
@@ -35,13 +35,14 @@ def create_school(current_user):
 @school_bp.route('/api/schools/<int:school_id>', methods=['PUT'])
 @token_required
 def update_school(current_user, school_id):
-    """Update a school's name (Developer only)."""
+    """Update a school's name and address (Developer only)."""
     if current_user.role != 'Developer':
         return jsonify({"error": "Permission denied."}), 403
         
     school = School.query.get_or_404(school_id)
     data = request.get_json()
     school.name = data.get('name', school.name)
+    school.address = data.get('address', school.address) # Update the address
     db.session.commit()
     return jsonify({"message": "School updated successfully."})
 

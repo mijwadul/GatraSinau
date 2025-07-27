@@ -139,9 +139,9 @@ function SchoolManagementPage() {
             src={SchoolImage}
             alt="School illustration"
             sx={{
-                  height: { xs: 160, md: 220 }, // Increased height for both mobile and desktop
-                  maxWidth: { xs: '60%', md: 'auto' } // Added maxWidth for better scaling on mobile
-               }}
+              height: { xs: 160, md: 220 },
+              maxWidth: { xs: '80%', md: 'auto' }
+            }}
           />
         </Box>
         <TableContainer component={Paper}>
@@ -149,6 +149,7 @@ function SchoolManagementPage() {
               <TableHead>
                 <TableRow>
                   <TableCell>School Name</TableCell>
+                  <TableCell>Address</TableCell>
                   <TableCell align="right">Actions</TableCell>
                 </TableRow>
               </TableHead>
@@ -156,6 +157,7 @@ function SchoolManagementPage() {
                 {schools.map((row) => (
                   <TableRow key={row.id}>
                     <TableCell>{row.name}</TableCell>
+                    <TableCell>{row.address}</TableCell>
                     <TableCell align="right">
                       <IconButton onClick={() => handleOpenEditModal(row)} color="primary">
                         <EditIcon />
@@ -181,7 +183,7 @@ function SchoolManagementPage() {
         onClose={handleCloseConfirmModal}
         onConfirm={handleConfirmDelete}
         title="Confirm Deletion"
-        message={`Are you sure you want to delete the school "${schoolToDelete?.name}"? All associated classes and users will also be deleted.`}
+        message={`Are you sure you want to delete the school "${schoolToDelete?.name}"? All associated classes will also be deleted.`}
       />
     </motion.div>
   );
